@@ -1,4 +1,4 @@
-from molecularIDDeclaration import uvc1_hash_t, uvc1_refgpos_t, uvc1_flag_t
+from commonClasses import uvc1_hash_t, uvc1_refgpos_t, uvc1_flag_t
 from hashDeclaration import hash2hash, strhash
 
 class MolecularBarcode:
