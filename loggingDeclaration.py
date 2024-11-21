@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-class Log:
+class Logger:
     # Define log levels
     CRITICAL = logging.CRITICAL
     ERROR = logging.ERROR
@@ -19,7 +19,7 @@ class Log:
 
     def __init__(self):
         """
-        Initialize the Log object with an empty message.
+        Initialize the Logger object with an empty message.
         """
         self.message_level = None
         self.message = []
@@ -41,7 +41,7 @@ class Log:
         """
         Output the message if its level is within the reporting level.
         """
-        if self.message_level <= Log._reporting_level:
+        if self.message_level <= Logger._reporting_level:
             log_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             log_level = self._level_to_string(self.message_level)
             print(f"{log_time} [{log_level}] {' '.join(self.message)}")
@@ -51,14 +51,14 @@ class Log:
         """
         Get the current reporting level.
         """
-        return Log._reporting_level
+        return Logger._reporting_level
 
     @staticmethod
     def set_reporting_level(level):
         """
         Set the reporting level to control which messages are logged.
         """
-        Log._reporting_level = level
+        Logger._reporting_level = level
 
     @staticmethod
     def _level_to_string(level):
@@ -66,49 +66,22 @@ class Log:
         Convert a log level integer to a human-readable string.
         """
         level_map = {
-            Log.CRITICAL: "CRITICAL",
-            Log.ERROR: "ERROR",
-            Log.WARNING: "WARNING",
-            Log.INFO: "INFO",
-            Log.INFO2: "INFO2",
-            Log.DEBUG: "DEBUG",
-            Log.DEBUG1: "DEBUG1",
-            Log.DEBUG2: "DEBUG2",
-            Log.DEBUG3: "DEBUG3",
-            Log.DEBUG4: "DEBUG4",
+            Logger.CRITICAL: "CRITICAL",
+            Logger.ERROR: "ERROR",
+            Logger.WARNING: "WARNING",
+            Logger.INFO: "INFO",
+            Logger.INFO2: "INFO2",
+            Logger.DEBUG: "DEBUG",
+            Logger.DEBUG1: "DEBUG1",
+            Logger.DEBUG2: "DEBUG2",
+            Logger.DEBUG3: "DEBUG3",
+            Logger.DEBUG4: "DEBUG4",
         }
         return level_map.get(level, "UNKNOWN")
 
 # Add custom levels to Python logging (optional, for compatibility with other loggers)
-logging.addLevelName(Log.INFO2, "INFO2")
-logging.addLevelName(Log.DEBUG1, "DEBUG1")
-logging.addLevelName(Log.DEBUG2, "DEBUG2")
-logging.addLevelName(Log.DEBUG3, "DEBUG3")
-logging.addLevelName(Log.DEBUG4, "DEBUG4")
-
-# Example usage
-log = Log()
-log.set_reporting_level(Log.DEBUG)
-
-# Log a message
-logger = log.get(Log.INFO)
-logger.write("This is an info-level message.")
-logger.flush()
-
-# Log a debug-level message
-logger = log.get(Log.DEBUG)
-logger.write("This is a debug-level message.")
-logger.flush()
-
-# Change reporting level
-log.set_reporting_level(Log.WARNING)
-
-# This won't print because it's below the reporting level
-logger = log.get(Log.INFO)
-logger.write("This info message will not be shown.")
-logger.flush()
-
-# This will print because it's at the warning level
-logger = log.get(Log.WARNING)
-logger.write("This is a warning-level message.")
-logger.flush()
+logging.addLevelName(Logger.INFO2, "INFO2")
+logging.addLevelName(Logger.DEBUG1, "DEBUG1")
+logging.addLevelName(Logger.DEBUG2, "DEBUG2")
+logging.addLevelName(Logger.DEBUG3, "DEBUG3")
+logging.addLevelName(Logger.DEBUG4, "DEBUG4")
