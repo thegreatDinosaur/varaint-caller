@@ -1,10 +1,11 @@
-#purpose of this file is to declare classes and functions that are used in multiple files
-#it defines constants, datatypes and provide utility functions and structures defination.
-
-from typing import List, Tuple, Union, Dict, Any
 import math
 import struct
-from collections import namedtuple
+from typing import List, Tuple, Union
+
+
+# Compilation flags
+COMPILATION_ENABLE_XMGOT = 0
+COMPILATION_TRY_HIGH_DEPTH_POS_BIAS = 0
 
 # Constants
 MGVCF_REGION_MAX_SIZE = 1000
@@ -18,42 +19,18 @@ OUTVAR_ADDITIONAL_INDEL_CANDIDATE = 0x10
 OUTVAR_BASE_NN = 0x20
 OUTVAR_LINK_NN = 0x40
 
+OPT_ONLY_PRINT_VCF_HEADER = "/only-print-vcf-header/"
+OPT_ONLY_PRINT_DEBUG_DETAIL = "/only-print-debug-detail/"
+
+PLAT_ILLUMINA_LIKE = "Illumina/BGI"
+PLAT_ION_LIKE = "IonTorrent/LifeTechnologies/ThermoFisher"
+
 MAX_STR_N_BASES = 100
 MAX_INSERT_SIZE = 2000
-DBLFLT_EPS = float(struct.unpack("d", struct.pack("d", 1.1920929e-07))[0])
 
-# Utility Functions
-def min_value(x, y):
-    return min(x, y)
+DBLFLT_EPS = float(struct.unpack('f', struct.pack('f', 1.0))[0]) - 1.0
 
-def max_value(x, y):
-    return max(x, y)
-
-def norm_insert_size(isize: int):
-    return 0 if abs(isize) >= MAX_INSERT_SIZE else isize
-
-def are_intervals_overlapping(int1min, int1max, int2min, int2max):
-    return not ((int1max <= int2min) or (int2max <= int1min))
-
-def phred2nat(x: float) -> float:
-    return (math.log(10.0) / 10.0) * x
-
-def nat2phred(x: float) -> float:
-    return (10.0 / math.log(10.0)) * x
-
-def frac2phred(x: float) -> float:
-    return -(10.0 / math.log(10.0)) * math.log(x)
-
-def phred2frac(x: float) -> float:
-    return 10 ** (-x / 10.0)
-
-def numstates2phred(x: float) -> float:
-    return (10.0 / math.log(10.0)) * math.log(x)
-
-def phred2numstates(x: float) -> float:
-    return 10 ** (x / 10.0)
-
-# Typedef Equivalents
+# Type Aliases
 uvc1_unsigned_int_t = int
 uvc1_qual_t = int
 uvc1_deciphred_t = int
@@ -71,73 +48,103 @@ uvc1_qual_big_t = int
 uvc1_flag_t = int
 uvc1_hash_t = int
 
-# Enum Equivalents
-class AssayType:
-    AUTO = 0
-    CAPTURE = 1
-    AMPLICON = 2
 
-ASSAY_TYPE_TO_MSG = ["AUTO", "CAPTURE", "AMPLICON"]
+# Enums (Implemented as Python dictionaries)
+AssayType = {
+    "ASSAY_TYPE_AUTO": 0,
+    "ASSAY_TYPE_CAPTURE": 1,
+    "ASSAY_TYPE_AMPLICON": 2,
+}
 
-class MoleculeTag:
-    AUTO = 0
-    NONE = 1
-    BARCODING = 2
-    DUPLEX = 3
+MoleculeTag = {
+    "MOLECULE_TAG_AUTO": 0,
+    "MOLECULE_TAG_NONE": 1,
+    "MOLECULE_TAG_BARCODING": 2,
+    "MOLECULE_TAG_DUPLEX": 3,
+}
 
-MOLECULE_TAG_TO_MSG = ["AUTO", "NONE", "BARCODING", "DUPLEX"]
+SequencingPlatform = {
+    "SEQUENCING_PLATFORM_AUTO": 0,
+    "SEQUENCING_PLATFORM_ILLUMINA": 1,
+    "SEQUENCING_PLATFORM_IONTORRENT": 2,
+    "SEQUENCING_PLATFORM_OTHER": 3,
+}
 
-class SequencingPlatform:
-    AUTO = 0
-    ILLUMINA = 1
-    IONTORRENT = 2
-    OTHER = 3
+PairEndMerge = {
+    "PAIR_END_MERGE_YES": 0,
+    "PAIR_END_MERGE_NO": 1,
+}
 
-SEQUENCING_PLATFORM_TO_MSG = ["AUTO", "ILLUMINA", "IONTORRENT", "OTHER"]
-SEQUENCING_PLATFORM_TO_NAME = SEQUENCING_PLATFORM_TO_MSG
 
-class PairEndMerge:
-    YES = 0
-    NO = 1
+# Helper Functions
+def phred2nat(x: float) -> float:
+    return (math.log(10.0) / 10.0) * x
 
-PAIR_END_MERGE_TO_MSG = ["YES", "NO"]
 
-# Struct Equivalents
+def nat2phred(x: float) -> float:
+    return (10.0 / math.log(10.0)) * x
+
+
+def frac2phred(x: float) -> float:
+    return -(10.0 / math.log(10.0)) * math.log(x)
+
+
+def phred2frac(x: float) -> float:
+    return math.pow(10.0, -x / 10.0)
+
+
+def numstates2phred(x: float) -> float:
+    return (10.0 / math.log(10.0)) * math.log(x)
+
+
+def phred2numstates(x: float) -> float:
+    return math.pow(10.0, x / 10.0)
+
+
+def mathsquare(x: Union[int, float]) -> Union[int, float]:
+    return x * x
+
+
+def non_neg_minus(a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+    return max(a - b, 0)
+
+
+def anyuint2hexstring(n: int) -> str:
+    return hex(n)[2:].upper()
+
+
+def are_intervals_overlapping(int1min: int, int1max: int, int2min: int, int2max: int) -> bool:
+    return not (int1max <= int2min or int2max <= int1min)
+
+
+# Structs
 class RegionalTandemRepeat:
     def __init__(self):
         self.begpos: uvc1_refgpos_t = 0
         self.tracklen: uvc1_readpos_t = 0
         self.unitlen: uvc1_readpos_t = 0
-        self.indelphred: uvc1_qual_t = 43
+        self.indelphred: uvc1_qual_t = 40 + 3
         self.anyTR_begpos: uvc1_refgpos_t = 0
         self.anyTR_tracklen: uvc1_readpos_t = 0
         self.anyTR_unitlen: uvc1_readpos_t = 0
 
+
 class RevComplement:
     def __init__(self):
-        self.data = {chr(i): chr(i) for i in range(128)}
-        self.data.update({
-            'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C',
-            'a': 't', 't': 'a', 'c': 'g', 'g': 'c',
-        })
-        self.table16 = {1: 8 // 1, 2: 8 // 2, 4: 8 // 4, 8: 8 // 8}
+        self.data = [chr(i) for i in range(128)]
+        self.data[ord('A')] = 'T'
+        self.data[ord('T')] = 'A'
+        self.data[ord('C')] = 'G'
+        self.data[ord('G')] = 'C'
+        self.data[ord('a')] = 't'
+        self.data[ord('t')] = 'a'
+        self.data[ord('c')] = 'g'
+        self.data[ord('g')] = 'c'
+        self.table16 = [i for i in range(16)]
+        self.table16[1] = 8 // 1
+        self.table16[2] = 8 // 2
+        self.table16[4] = 8 // 4
+        self.table16[8] = 8 // 8
 
-    def complement(self, base: str) -> str:
-        return self.data.get(base, base)
 
 STATIC_REV_COMPLEMENT = RevComplement()
-
-# Template Function Equivalents
-def mathsquare(x: Union[int, float]) -> Union[int, float]:
-    return x * x
-
-def non_neg_minus(a: int, b: int) -> int:
-    return max(a - b, 0)
-
-def anyuint2hexstring(n: int) -> str:
-    return f"{n:0{2 * n.bit_length() // 8}X}"
-
-def compare_diff_less(k1, k2):
-    isdiff = (k1 != k2)
-    isless = (k1 < k2)
-    return isdiff, isless
