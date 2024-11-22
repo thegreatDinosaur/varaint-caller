@@ -1,44 +1,38 @@
-from enum import Enum
-import commonClasses
+# Import constants from commonDeclaration.py
+from commonClasses import *
+# Mapping ASSAY_TYPE to descriptive messages
+ASSAY_TYPE_TO_MSG = [
+    "Assay type of each molecule fragment will be automatically inferred from the data",  # ASSAY_TYPE_AUTO
+    "Data is generated from a capture-based assay with selection by probe hybridization", # ASSAY_TYPE_CAPTURE
+    "Data is generated from an amplicon-based assay with targeted amplification by PCR"   # ASSAY_TYPE_AMPLICON
+]
 
-# Enums to represent assay type, molecule tag, sequencing platform, and pair end merge options
-class AssayType(Enum):
-    AUTO = 0
-    CAPTURE = 1
-    AMPLICON = 2
+# Mapping MOLECULE_TAG to descriptive messages
+MOLECULE_TAG_TO_MSG = [
+    "Molecule tag of each molecule fragment will be automatically inferred from the data",  # MOLECULE_TAG_AUTO
+    "Molecule is not tagged",                                                              # MOLECULE_TAG_NONE
+    "Molecule is tagged with a unique molecular identifier (UMI) on one strand as in Safe-SeqS",  # MOLECULE_TAG_BARCODING
+    "Molecule is tagged with a duplex UMI"                                                 # MOLECULE_TAG_DUPLEX
+]
 
-class MoleculeTag(Enum):
-    AUTO = 0
-    NONE = 1
-    BARCODING = 2
-    DUPLEX = 3
+# Mapping SEQUENCING_PLATFORM to descriptive messages
+SEQUENCING_PLATFORM_TO_MSG = [
+    "Unknown sequencing platform that will be automatically inferred from the data",  # SEQUENCING_PLATFORM_AUTO
+    "Illumina sequencing platform (compatible with BGI and MGI)",                    # SEQUENCING_PLATFORM_ILLUMINA
+    "IonTorrent sequencing platform by Life Technologies and ThermoFisher",          # SEQUENCING_PLATFORM_IONTORRENT
+    "Other sequencing platform (for example, Nanopore)"                              # SEQUENCING_PLATFORM_OTHER
+]
 
-class SequencingPlatform(Enum):
-    AUTO = 0
-    ILLUMINA = 1
-    IONTORRENT = 2
-    OTHER = 3
+# Mapping SEQUENCING_PLATFORM to short names
+SEQUENCING_PLATFORM_TO_NAME = [
+    "AUTO",                   # SEQUENCING_PLATFORM_AUTO
+    PLAT_ILLUMINA_LIKE,       # SEQUENCING_PLATFORM_ILLUMINA
+    PLAT_ION_LIKE,            # SEQUENCING_PLATFORM_IONTORRENT
+    "OtherSequencingPlatform" # SEQUENCING_PLATFORM_OTHER
+]
 
-class PairEndMerge(Enum):
-    YES = 0
-    NO = 1
-
-# Function to get the message for each assay type
-def get_assay_type_msg(assay_type: AssayType) -> str:
-    return commonClasses.ASSAY_TYPE_TO_MSG[assay_type.value]
-
-# Function to get the message for each molecule tag
-def get_molecule_tag_msg(molecule_tag: MoleculeTag) -> str:
-    return commonClasses.MOLECULE_TAG_TO_MSG[molecule_tag.value]
-
-# Function to get the message for each sequencing platform
-def get_sequencing_platform_msg(sequencing_platform: SequencingPlatform) -> str:
-    return commonClasses.SEQUENCING_PLATFORM_TO_MSG[sequencing_platform.value]
-
-# Function to get the name for each sequencing platform
-def get_sequencing_platform_name(sequencing_platform: SequencingPlatform) -> str:
-    return commonClasses.SEQUENCING_PLATFORM_TO_NAME[sequencing_platform.value]
-
-# Function to get the message for pair end merge
-def get_pair_end_merge_msg(pair_end_merge: PairEndMerge) -> str:
-    return commonClasses.PAIR_END_MERGE_TO_MSG[pair_end_merge.value]
+# Mapping PAIR_END_MERGE to descriptive messages
+PAIR_END_MERGE_TO_MSG = [
+    "paired-end sequenced segments are merged",       # PAIR_END_MERGE_YES
+    "paired-end sequenced segments are not merged"    # PAIR_END_MERGE_NO
+]
