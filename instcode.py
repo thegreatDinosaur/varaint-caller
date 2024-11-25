@@ -1,13 +1,16 @@
 from collections import defaultdict
 import numpy as np
 
-# Define required constants (these should be set according to your needs)
+# Define required constants
 LINK_I1, LINK_I2, LINK_I3P = 1, 2, 3
 LINK_D1, LINK_D2, LINK_D3P = 4, 5, 6
 UNSIGN2SIGN = lambda x: x  # Replace with actual conversion logic
 MAX = max
 
-# Assumed class for BcfFormat and other types (replace with actual classes or structures)
+# Define INDEL_ID
+INDEL_ID = 1  # Change this value to dynamically adapt the behavior
+
+# Assumed class for BcfFormat and other types
 class BcfFormat:
     def __init__(self):
         self.gapNf = []
@@ -21,6 +24,7 @@ class BcfFormat:
         self.ADr = [0, 0]  # Assuming 2 strands
         self.gapNum = [0, 0]  # Assuming 2 strands
 
+# Helper functions
 def isSymbolIns(symbol):
     return symbol in [LINK_I1, LINK_I2, LINK_I3P]
 
@@ -30,6 +34,17 @@ def isSymbolDel(symbol):
 def posToIndelToData_get(depth_map, refpos, indel):
     # Replace this with actual logic to fetch data from depth map
     return depth_map.get(refpos, {}).get(indel, 0)
+
+def get_indel_string(indel, refpos, refchars, symbol2CountCoverageSet):
+    """
+    Returns the appropriate representation of the indel based on INDEL_ID.
+    """
+    if INDEL_ID == 1:
+        return indel  # Text-based indel representation
+    else:
+        return refchars[
+            refpos - symbol2CountCoverageSet.getUnifiedIncluBegPosition() : refpos + len(indel)
+        ]
 
 def fill_by_indel_info(fmt, symbol2CountCoverageSet, strand, refpos, symbol, bq_tsum_depth, fq_tsum_depth, fq_tsum_depth_c2DP, fq_tsum_depth_c2dDP, refchars, specialflag):
     assert isSymbolIns(symbol) or isSymbolDel(symbol), f"Invalid symbol: {symbol}"
@@ -43,10 +58,7 @@ def fill_by_indel_info(fmt, symbol2CountCoverageSet, strand, refpos, symbol, bq_
 
     bqfq_depth_mutform_tuples = []
     for indel, data in bq_tsum_depth.get(refpos, {}).items():
-        if INDEL_ID == 1:
-            indelstring = indel
-        else:
-            indelstring = refchars[refpos - symbol2CountCoverageSet.getUnifiedIncluBegPosition():refpos + len(indel)]
+        indelstring = get_indel_string(indel, refpos, refchars, symbol2CountCoverageSet)
         
         if not indelstring:
             continue
